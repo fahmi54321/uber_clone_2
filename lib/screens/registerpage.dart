@@ -54,7 +54,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     })).user;
 
-    Navigator.pop(context); // close dialog
+    Navigator.pop(context); // close dialog //
 
     if(user != null){
       DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users/${user.uid}');
