@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:uber_clone_2/styles/styles.dart';
 import 'package:uber_clone_2/widgets/brand_divider.dart';
 
 import 'brand_colors.dart';
@@ -18,8 +19,9 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
-  double mapBottomPadding = 0; //todo 1
-  double searchSheetHeight = (Platform.isIOS) ? 300 : 275; // todo 2
+  double mapBottomPadding = 0;
+  double searchSheetHeight = (Platform.isIOS) ? 300 : 275;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>(); //todo 1
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -29,9 +31,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Uber clone'),
-      ),
+      key: scaffoldKey, // todo 2
       body: Stack(
         children: [
           GoogleMap(
@@ -44,17 +44,50 @@ class _MainPageState extends State<MainPage> {
               mapController = controller;
 
               setState(() {
-                mapBottomPadding = (Platform.isAndroid) ? 280 : 270; //todo 3
+                mapBottomPadding = (Platform.isAndroid) ? 280 : 270;
               });
 
             },
           ),
+
+          // MenuButton
+          Positioned( //todo 3
+            top: 44,
+            left: 20,
+            child: GestureDetector(
+              onTap: (){
+                scaffoldKey.currentState.openDrawer();
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 5.0,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7,0.7),
+                    )
+                  ]
+                ),
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 20,
+                  child: Icon(Icons.menu,color: Colors.black87,),
+                ),
+              ),
+            ),
+          ),
+
+
+          // SearchSheet
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              height: searchSheetHeight, // todo 4 (finish)
+              height: searchSheetHeight,
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -183,6 +216,60 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
         ],
+      ),
+      drawer: Container( //todo 4 (finish)
+        width: 250,
+        color: Colors.white,
+        child: Drawer(
+          child: ListView(
+            padding: EdgeInsets.all(0),
+            children: [
+              Container(color: Colors.white,height: 160,child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: Row(children: [
+                  Image.asset('images/user_icon.png',height: 60,width: 60),
+                  SizedBox(width: 15,),
+                  Column(mainAxisAlignment: MainAxisAlignment.center,children: [
+                    Text('Fahmi',style: TextStyle(fontSize: 20,fontFamily: 'Brand-Bold')),
+                    SizedBox(height: 5),
+                    Text('View Profile'),
+                  ],),
+                ],),
+              ),),
+              BrandDivider(),
+
+              SizedBox(height: 10),
+
+              ListTile(
+                leading: Icon(OMIcons.cardGiftcard),
+                title: Text('Free Rides',style: kDrawerItemStyle,),
+              ),
+
+              ListTile(
+                leading: Icon(OMIcons.creditCard),
+                title: Text('Payments',style: kDrawerItemStyle,),
+              ),
+
+              ListTile(
+                leading: Icon(OMIcons.history),
+                title: Text('Ride History',style: kDrawerItemStyle,),
+              ),
+
+              ListTile(
+                leading: Icon(OMIcons.contactSupport),
+                title: Text('Support',style: kDrawerItemStyle,),
+              ),
+
+              ListTile(
+                leading: Icon(OMIcons.info),
+                title: Text('About',style: kDrawerItemStyle,),
+              ),
+
+            ],
+          ),
+        ),
       ),
     );
   }
