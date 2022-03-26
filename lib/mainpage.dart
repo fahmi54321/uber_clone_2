@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,6 +18,8 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
+  double mapBottomPadding = 0; //todo 1
+  double searchSheetHeight = (Platform.isIOS) ? 300 : 275; // todo 2
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -32,20 +35,26 @@ class _MainPageState extends State<MainPage> {
       body: Stack(
         children: [
           GoogleMap(
+            padding: EdgeInsets.only(bottom: mapBottomPadding),
             initialCameraPosition: _kGooglePlex,
             mapType: MapType.normal,
             myLocationButtonEnabled: true,
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
               mapController = controller;
+
+              setState(() {
+                mapBottomPadding = (Platform.isAndroid) ? 280 : 270; //todo 3
+              });
+
             },
           ),
-          Positioned( //todo 1
+          Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              height: 300,
+              height: searchSheetHeight, // todo 4 (finish)
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -167,7 +176,7 @@ class _MainPageState extends State<MainPage> {
                           ],
                         ),
                       ],
-                    ), //todo 2 (finish)
+                    ),
                   ],
                 ),
               ),
