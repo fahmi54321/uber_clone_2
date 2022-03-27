@@ -8,6 +8,7 @@ import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/helpers/helpersmethod.dart';
+import 'package:uber_clone_2/screens/searchpage.dart';
 import 'package:uber_clone_2/styles/styles.dart';
 import 'package:uber_clone_2/widgets/brand_divider.dart';
 
@@ -74,7 +75,7 @@ class _MainPageState extends State<MainPage> {
             },
             myLocationEnabled: true,
             zoomGesturesEnabled: true,
-            zoomControlsEnabled: true,
+            zoomControlsEnabled: false,
           ),
 
           // MenuButton
@@ -148,31 +149,36 @@ class _MainPageState extends State<MainPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(
-                            4,
+                    GestureDetector( //todo 1 (next searchpage)
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(
+                              4,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 5.0,
+                                spreadRadius: 0.5,
+                                offset: Offset(0.7, 0.7),
+                              ),
+                            ]),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.9),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search,
+                                color: Colors.blueAccent,
+                              ),
+                              SizedBox(width: 10),
+                              Text('Search Destination'),
+                            ],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 5.0,
-                              spreadRadius: 0.5,
-                              offset: Offset(0.7, 0.7),
-                            ),
-                          ]),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.9),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.search,
-                              color: Colors.blueAccent,
-                            ),
-                            SizedBox(width: 10),
-                            Text('Search Destination'),
-                          ],
                         ),
                       ),
                     ),
@@ -191,7 +197,7 @@ class _MainPageState extends State<MainPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text((Provider.of<AppData>(context).pickupAddress != //todo 5 (finish)
+                            Text((Provider.of<AppData>(context).pickupAddress !=
                                     null)
                                 ? Provider.of<AppData>(context)
                                     .pickupAddress
