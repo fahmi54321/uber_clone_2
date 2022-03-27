@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_clone_2/brand_colors.dart';
+import 'package:uber_clone_2/datamodels/prediction.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/globalvariable.dart';
 import 'package:uber_clone_2/helpers/requesthelpers.dart';
@@ -27,7 +28,6 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  //todo 1
   void searchPlace(String placeName) async{
 
     if(placeName.length > 1){
@@ -38,7 +38,11 @@ class _SearchPageState extends State<SearchPage> {
         return;
       }
 
-      print(response);
+      //todo 2 (finish)
+      if(response['status'] == 'OK'){
+        var predictionJson = response['predictions'];
+        var thisList = (predictionJson as List).map((e) => Prediction.fromJson(e)).toList();
+      }
     }
 
   }
@@ -140,7 +144,7 @@ class _SearchPageState extends State<SearchPage> {
                             padding: const EdgeInsets.all(2.0),
                             child: TextField(
                               onChanged: (value){
-                                searchPlace(value); //todo 2 (finish)
+                                searchPlace(value);
                               },
                               focusNode: focusDestination,
                               controller: destinationController,
