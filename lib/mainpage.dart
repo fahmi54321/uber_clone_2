@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:uber_clone_2/helpers/helpersmethod.dart';
 import 'package:uber_clone_2/styles/styles.dart';
 import 'package:uber_clone_2/widgets/brand_divider.dart';
 
@@ -30,16 +31,20 @@ class _MainPageState extends State<MainPage> {
   );
 
 
-  var geolocator = Geolocator(); //todo 1
-  Position currentPosition; //todo 2
+  var geolocator = Geolocator();
+  Position currentPosition;
 
-  void setupPositionLocator() async{ //todo 3
+  void setupPositionLocator() async{
       Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
       currentPosition = position;
 
       LatLng pos = LatLng(position.latitude, position.longitude);
       CameraPosition cp = CameraPosition(target: pos,zoom: 14);
       mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
+
+
+      String address = await HelperMethods.findCoordinateAddress(position); //todo 3
+      print(address); //todo 4 (finish)
 
   }
 
@@ -62,12 +67,12 @@ class _MainPageState extends State<MainPage> {
                 mapBottomPadding = (Platform.isAndroid) ? 280 : 270;
               });
 
-              setupPositionLocator(); //todo 4
+              setupPositionLocator();
 
             },
-            myLocationEnabled: true, //todo 5
-            zoomGesturesEnabled: true, //todo 6
-            zoomControlsEnabled: true, //todo 7 (finish)
+            myLocationEnabled: true,
+            zoomGesturesEnabled: true,
+            zoomControlsEnabled: true,
           ),
 
           // MenuButton
