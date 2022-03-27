@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:uber_clone_2/styles/styles.dart';
@@ -21,17 +22,31 @@ class _MainPageState extends State<MainPage> {
   GoogleMapController mapController;
   double mapBottomPadding = 0;
   double searchSheetHeight = (Platform.isIOS) ? 300 : 275;
-  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>(); //todo 1
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
 
+
+  var geolocator = Geolocator(); //todo 1
+  Position currentPosition; //todo 2
+
+  void setupPositionLocator() async{ //todo 3
+      Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
+      currentPosition = position;
+
+      LatLng pos = LatLng(position.latitude, position.longitude);
+      CameraPosition cp = CameraPosition(target: pos,zoom: 14);
+      mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey, // todo 2
+      key: scaffoldKey,
       body: Stack(
         children: [
           GoogleMap(
@@ -47,7 +62,12 @@ class _MainPageState extends State<MainPage> {
                 mapBottomPadding = (Platform.isAndroid) ? 280 : 270;
               });
 
+              setupPositionLocator(); //todo 4
+
             },
+            myLocationEnabled: true, //todo 5
+            zoomGesturesEnabled: true, //todo 6
+            zoomControlsEnabled: true, //todo 7 (finish)
           ),
 
           // MenuButton
@@ -217,7 +237,7 @@ class _MainPageState extends State<MainPage> {
           ),
         ],
       ),
-      drawer: Container( //todo 4 (finish)
+      drawer: Container(
         width: 250,
         color: Colors.white,
         child: Drawer(
