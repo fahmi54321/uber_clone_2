@@ -3,7 +3,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:uber_clone_2/globalvariable.dart';
 import 'package:uber_clone_2/helpers/requesthelpers.dart';
 
-//todo 2 (next mainpage)
 class HelperMethods{
   static Future<dynamic> findCoordinateAddress(Position position) async{
     String placeAddress = '';

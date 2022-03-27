@@ -43,8 +43,8 @@ class _MainPageState extends State<MainPage> {
       mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
 
 
-      String address = await HelperMethods.findCoordinateAddress(position); //todo 3
-      print(address); //todo 4 (finish)
+      String address = await HelperMethods.findCoordinateAddress(position);
+      print(address);
 
   }
 
