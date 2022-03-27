@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/helpers/helpersmethod.dart';
 import 'package:uber_clone_2/styles/styles.dart';
 import 'package:uber_clone_2/widgets/brand_divider.dart';
@@ -43,7 +45,7 @@ class _MainPageState extends State<MainPage> {
       mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
 
 
-      String address = await HelperMethods.findCoordinateAddress(position);
+      String address = await HelperMethods.findCoordinateAddress(position,context);
       print(address);
 
   }
@@ -76,7 +78,7 @@ class _MainPageState extends State<MainPage> {
           ),
 
           // MenuButton
-          Positioned( //todo 3
+          Positioned(
             top: 44,
             left: 20,
             child: GestureDetector(
@@ -189,7 +191,12 @@ class _MainPageState extends State<MainPage> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Add Home'),
+                            Text((Provider.of<AppData>(context).pickupAddress != //todo 5 (finish)
+                                    null)
+                                ? Provider.of<AppData>(context)
+                                    .pickupAddress
+                                    .placeName
+                                : 'Add Home'),
                             SizedBox(height: 3),
                             Text(
                               'Your residential address',

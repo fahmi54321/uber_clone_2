@@ -1,10 +1,13 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:uber_clone_2/datamodels/address.dart';
+import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/globalvariable.dart';
 import 'package:uber_clone_2/helpers/requesthelpers.dart';
+import 'package:provider/provider.dart';
 
 class HelperMethods{
-  static Future<dynamic> findCoordinateAddress(Position position) async{
+  static Future<dynamic> findCoordinateAddress(Position position,context) async{
     String placeAddress = '';
 
     var connectivityResult = await Connectivity().checkConnectivity();
@@ -18,6 +21,17 @@ class HelperMethods{
 
     if(response != 'failed'){
       placeAddress = response['results'][0]['formatted_address'];
+
+      //todo 3
+      Address pickupAddress = Address();
+      pickupAddress.latitude = position.latitude;
+      pickupAddress.longitude = position.longitude;
+      pickupAddress.placeName = placeAddress;
+
+
+      //todo 4 (next mainpage)
+      Provider.of<AppData>(context,listen: false).updatePickupAddress(pickupAddress);
+
     }
 
     return placeAddress;
