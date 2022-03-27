@@ -23,7 +23,7 @@ class _SearchPageState extends State<SearchPage> {
 
   var focusDestination = FocusNode();
 
-  List<Prediction> destinationPredictionList = []; //todo 2
+  List<Prediction> destinationPredictionList = [];
 
   bool focused = false;
   void setFocus(){
@@ -48,7 +48,7 @@ class _SearchPageState extends State<SearchPage> {
         var thisList = (predictionJson as List).map((e) => Prediction.fromJson(e)).toList();
 
         setState(() {
-          destinationPredictionList = thisList; //todo 3
+          destinationPredictionList = thisList;
         });
       }
     }
@@ -174,7 +174,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
           ),
-          (destinationPredictionList.length > 0) //todo 4
+          (destinationPredictionList.length > 0)
               ? Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 16),
                 child: ListView.separated(
@@ -188,7 +188,7 @@ class _SearchPageState extends State<SearchPage> {
                     physics: ClampingScrollPhysics(),
                   ),
               )
-              : Container(), //todo 5 (finish)
+              : Container(),
         ],
       ),
     );
