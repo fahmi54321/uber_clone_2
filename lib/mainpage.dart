@@ -30,8 +30,8 @@ class _MainPageState extends State<MainPage> {
   double searchSheetHeight = (Platform.isIOS) ? 300 : 275;
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<LatLng> polylineCoordinates = []; //todo 1
-  Set<Polyline> _polylines = {}; //todo 2
+  List<LatLng> polylineCoordinates = [];
+  Set<Polyline> _polylines = {};
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -75,7 +75,6 @@ class _MainPageState extends State<MainPage> {
 
     print(thisDetails.encodePoints);
 
-    //todo 3
     PolylinePoints polylinePoints = PolylinePoints();
     List<PointLatLng> results = polylinePoints.decodePolyline(thisDetails.encodePoints);
 
@@ -91,7 +90,7 @@ class _MainPageState extends State<MainPage> {
 
     _polylines.clear();
 
-    setState(() { //todo 4
+    setState(() {
       Polyline polyline = Polyline(
         polylineId: PolylineId('polyid'),
         color: Color.fromARGB(255, 95, 109, 237),
@@ -106,6 +105,36 @@ class _MainPageState extends State<MainPage> {
       _polylines.add(polyline);
 
     });
+
+    // make polyline to fit into the map
+
+    LatLngBounds bounds; //todo 1
+
+    //todo 2
+    if(pickLatlng.latitude > destinationLatlng.latitude && pickLatlng.longitude > destinationLatlng.longitude){
+      bounds = LatLngBounds(southwest: destinationLatlng, northeast: pickLatlng);
+    }else if(pickLatlng.longitude > destinationLatlng.longitude){
+      bounds = LatLngBounds(
+        southwest: LatLng(pickLatlng.latitude, destinationLatlng.longitude),
+        northeast: LatLng(
+          destinationLatlng.latitude,
+          pickLatlng.longitude,
+        ),
+      );
+    }else if(pickLatlng.latitude > destinationLatlng.latitude){
+      bounds = LatLngBounds(
+        southwest: LatLng(destinationLatlng.latitude, pickLatlng.longitude),
+        northeast: LatLng(
+          pickLatlng.latitude,
+          destinationLatlng.longitude,
+        ),
+      );
+    }else{
+      bounds = LatLngBounds(southwest: pickLatlng, northeast: destinationLatlng);
+    }
+
+    //todo 3 (finish)
+    mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
   }
 
   @override
@@ -133,7 +162,7 @@ class _MainPageState extends State<MainPage> {
             myLocationEnabled: true,
             zoomGesturesEnabled: true,
             zoomControlsEnabled: false,
-            polylines: _polylines, //todo 5 (finish)
+            polylines: _polylines,
           ),
 
           // MenuButton
