@@ -1,6 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_clone_2/datamodels/address.dart';
+import 'package:uber_clone_2/datamodels/directiondetails.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/globalvariable.dart';
 import 'package:uber_clone_2/helpers/requesthelpers.dart';
@@ -22,14 +24,12 @@ class HelperMethods{
     if(response != 'failed'){
       placeAddress = response['results'][0]['formatted_address'];
 
-      //todo 3
       Address pickupAddress = Address();
       pickupAddress.latitude = position.latitude;
       pickupAddress.longitude = position.longitude;
       pickupAddress.placeName = placeAddress;
 
 
-      //todo 4 (next mainpage)
       Provider.of<AppData>(context,listen: false).updatePickupAddress(pickupAddress);
 
     }
@@ -37,6 +37,31 @@ class HelperMethods{
     return placeAddress;
 
   }
+
+
+  //todo 1 (finish)
+  static Future<DirectionDetails> getDirectionDetails(LatLng startPosition, LatLng endPosition) async{
+    String url = 'https://maps.googleapis.com/maps/api/directions/json?origin=${startPosition.latitude},${startPosition.longitude}&destination=${endPosition.latitude},${endPosition.longitude}&mode=driving&key=$mapKey';
+
+
+    var response = await RequestHelper.getRequest(url);
+
+    if(response == 'failed'){
+      return null;
+    }
+
+    DirectionDetails directionDetails = DirectionDetails();
+
+    directionDetails.durationText = response['routes'][0]['legs'][0]['duration']['text'];
+    directionDetails.durationValue = response['routes'][0]['legs'][0]['duration']['value'];
+    directionDetails.distanceText = response['routes'][0]['legs'][0]['distance']['text'];
+    directionDetails.distanceValue = response['routes'][0]['legs'][0]['distance']['value'];
+    directionDetails.encodePoints = response['routes'][0]['overview_polyline']['points'];
+
+    return directionDetails;
+
+  }
+
 }
 
 /**
