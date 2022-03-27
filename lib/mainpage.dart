@@ -33,6 +33,9 @@ class _MainPageState extends State<MainPage> {
   List<LatLng> polylineCoordinates = [];
   Set<Polyline> _polylines = {};
 
+  Set<Marker> _markers = {}; //todo 1
+  Set<Circle> _circles = {}; //todo 2
+
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
@@ -106,11 +109,9 @@ class _MainPageState extends State<MainPage> {
 
     });
 
-    // make polyline to fit into the map
+    // set bounds, make polyline to fit into the map
+    LatLngBounds bounds;
 
-    LatLngBounds bounds; //todo 1
-
-    //todo 2
     if(pickLatlng.latitude > destinationLatlng.latitude && pickLatlng.longitude > destinationLatlng.longitude){
       bounds = LatLngBounds(southwest: destinationLatlng, northeast: pickLatlng);
     }else if(pickLatlng.longitude > destinationLatlng.longitude){
@@ -133,8 +134,55 @@ class _MainPageState extends State<MainPage> {
       bounds = LatLngBounds(southwest: pickLatlng, northeast: destinationLatlng);
     }
 
-    //todo 3 (finish)
     mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
+
+    //todo 3
+    // set marker
+    Marker pickupMarker = Marker(
+      markerId: MarkerId('pickup'),
+      position: pickLatlng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+      infoWindow: InfoWindow(title: pickup.placeName,snippet: 'My Location'),
+    );
+
+    Marker destinationMarker = Marker(
+      markerId: MarkerId('destination'),
+      position: destinationLatlng,
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      infoWindow: InfoWindow(title: destination.placeName,snippet: 'Destination'),
+    );
+
+    setState(() {
+      _markers.add(pickupMarker);
+      _markers.add(destinationMarker);
+    });
+
+    //todo 4
+    // set circle
+    Circle pickupCircle = Circle(
+      circleId: CircleId('pickup'),
+      strokeColor: Colors.green,
+      strokeWidth: 3,
+      radius: 12,
+      center: pickLatlng,
+      fillColor: BrandColors.colorGreen,
+    );
+
+    Circle destinationCircle = Circle(
+      circleId: CircleId('destination'),
+      strokeColor: BrandColors.colorAccentPurple,
+      strokeWidth: 3,
+      radius: 12,
+      center: destinationLatlng,
+      fillColor: BrandColors.colorAccentPurple,
+    );
+
+    setState(() {
+      _circles.add(pickupCircle);
+      _circles.add(destinationCircle);
+    });
+
+
   }
 
   @override
@@ -163,6 +211,8 @@ class _MainPageState extends State<MainPage> {
             zoomGesturesEnabled: true,
             zoomControlsEnabled: false,
             polylines: _polylines,
+            markers: _markers, //todo 5
+            circles: _circles, //todo 6 (finish)
           ),
 
           // MenuButton
