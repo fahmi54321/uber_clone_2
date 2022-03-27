@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_clone_2/brand_colors.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
+import 'package:uber_clone_2/globalvariable.dart';
+import 'package:uber_clone_2/helpers/requesthelpers.dart';
 
 class SearchPage extends StatefulWidget {
 
@@ -12,26 +14,42 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
 
-  var pickupController = TextEditingController(); //todo 1
-  var destinationController = TextEditingController(); //todo 2
+  var pickupController = TextEditingController();
+  var destinationController = TextEditingController();
 
-  var focusDestination = FocusNode(); //todo 3
+  var focusDestination = FocusNode();
 
-  bool focused = false; //todo 4
-  void setFocus(){ //todo 5
+  bool focused = false;
+  void setFocus(){
     if(!focused){
       FocusScope.of(context).requestFocus(focusDestination);
       focused = true;
     }
   }
 
+  //todo 1
+  void searchPlace(String placeName) async{
+
+    if(placeName.length > 1){
+      String url = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=123254251&components=country:id';
+      var response = await RequestHelper.getRequest(url);
+
+      if(response == 'failed'){
+        return;
+      }
+
+      print(response);
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    setFocus(); //todo 6
+    setFocus();
 
-    String address = Provider.of<AppData>(context).pickupAddress.placeName ?? ''; //todo 7
-    pickupController.text = address; //todo 8
+    String address = Provider.of<AppData>(context).pickupAddress.placeName ?? '';
+    pickupController.text = address;
 
     return Scaffold(
       body: Column(children: [
@@ -91,7 +109,7 @@ class _SearchPageState extends State<SearchPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: TextField(
-                              controller: pickupController, //todo 9
+                              controller: pickupController,
                               decoration: InputDecoration(
                                   hintText: 'Pickup location',
                                   fillColor: BrandColors.colorLightGrayFair,
@@ -121,8 +139,11 @@ class _SearchPageState extends State<SearchPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: TextField(
-                              focusNode: focusDestination, //todo 10
-                              controller: destinationController, //todo 11 (finish)
+                              onChanged: (value){
+                                searchPlace(value); //todo 2 (finish)
+                              },
+                              focusNode: focusDestination,
+                              controller: destinationController,
                               decoration: InputDecoration(
                                   hintText: 'Where to?',
                                   fillColor: BrandColors.colorLightGrayFair,
