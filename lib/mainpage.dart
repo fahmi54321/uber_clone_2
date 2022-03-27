@@ -149,7 +149,7 @@ class _MainPageState extends State<MainPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    GestureDetector( //todo 1 (next searchpage)
+                    GestureDetector(
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
                       },

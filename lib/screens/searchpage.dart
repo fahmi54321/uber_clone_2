@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uber_clone_2/brand_colors.dart';
+import 'package:uber_clone_2/dataprovider/appdata.dart';
 
 class SearchPage extends StatefulWidget {
 
@@ -8,10 +10,29 @@ class SearchPage extends StatefulWidget {
   _SearchPageState createState() => _SearchPageState();
 }
 
-//todo 2 (finish)
 class _SearchPageState extends State<SearchPage> {
+
+  var pickupController = TextEditingController(); //todo 1
+  var destinationController = TextEditingController(); //todo 2
+
+  var focusDestination = FocusNode(); //todo 3
+
+  bool focused = false; //todo 4
+  void setFocus(){ //todo 5
+    if(!focused){
+      FocusScope.of(context).requestFocus(focusDestination);
+      focused = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    setFocus(); //todo 6
+
+    String address = Provider.of<AppData>(context).pickupAddress.placeName ?? ''; //todo 7
+    pickupController.text = address; //todo 8
+
     return Scaffold(
       body: Column(children: [
         Container(
@@ -70,6 +91,7 @@ class _SearchPageState extends State<SearchPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: TextField(
+                              controller: pickupController, //todo 9
                               decoration: InputDecoration(
                                   hintText: 'Pickup location',
                                   fillColor: BrandColors.colorLightGrayFair,
@@ -99,6 +121,8 @@ class _SearchPageState extends State<SearchPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: TextField(
+                              focusNode: focusDestination, //todo 10
+                              controller: destinationController, //todo 11 (finish)
                               decoration: InputDecoration(
                                   hintText: 'Where to?',
                                   fillColor: BrandColors.colorLightGrayFair,
