@@ -11,10 +11,9 @@ import 'package:uber_clone_2/widgets/progress_dialog.dart';
 
 class PredictionTile extends StatelessWidget {
 
-  final Prediction prediction; //todo 1
+  final Prediction prediction;
   PredictionTile({this.prediction});
 
-  //todo 2
   void getPlaceDetails(String placeId,context) async{
     showDialog(
       context: context,
@@ -37,6 +36,8 @@ class PredictionTile extends StatelessWidget {
       
       Provider.of<AppData>(context,listen: false).updateDestinationAddress(thisPlace);
       print(thisPlace.placeName);
+
+      Navigator.pop(context,'getDirection'); //todo 1 (next mainpage)
       
     }
 
@@ -46,7 +47,7 @@ class PredictionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlatButton(
       onPressed: (){
-        getPlaceDetails(prediction.placeId,context); //todo 3 (finish)
+        getPlaceDetails(prediction.placeId,context);
       },
       child: Container(
         child: Column(

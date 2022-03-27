@@ -11,6 +11,7 @@ import 'package:uber_clone_2/helpers/helpersmethod.dart';
 import 'package:uber_clone_2/screens/searchpage.dart';
 import 'package:uber_clone_2/styles/styles.dart';
 import 'package:uber_clone_2/widgets/brand_divider.dart';
+import 'package:uber_clone_2/widgets/progress_dialog.dart';
 
 import 'brand_colors.dart';
 
@@ -48,6 +49,28 @@ class _MainPageState extends State<MainPage> {
 
       String address = await HelperMethods.findCoordinateAddress(position,context);
       print(address);
+
+  }
+
+  Future<void> getDirection() async{ //todo 3 (finish)
+    var pickup = Provider.of<AppData>(context,listen: false).pickupAddress;
+    var destination = Provider.of<AppData>(context,listen: false).destinationAddress;
+
+    var pickLatlng = LatLng(pickup.latitude, pickup.longitude);
+    var destinationLatlng = LatLng(destination.latitude, destination.longitude);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext ctx) => ProgressDialog(status: 'Please wait'),
+    );
+
+    var thisDetails = await HelperMethods.getDirectionDetails(pickLatlng, destinationLatlng);
+
+    Navigator.pop(context);
+
+    print(thisDetails.encodePoints);
+
 
   }
 
@@ -150,8 +173,12 @@ class _MainPageState extends State<MainPage> {
                       height: 20,
                     ),
                     GestureDetector(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+                      onTap: () async{
+                        var response = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+
+                        if(response == 'getDirection'){
+                          await getDirection(); //todo 2
+                        }
                       },
                       child: Container(
                         decoration: BoxDecoration(

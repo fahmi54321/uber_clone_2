@@ -39,7 +39,6 @@ class HelperMethods{
   }
 
 
-  //todo 1 (finish)
   static Future<DirectionDetails> getDirectionDetails(LatLng startPosition, LatLng endPosition) async{
     String url = 'https://maps.googleapis.com/maps/api/directions/json?origin=${startPosition.latitude},${startPosition.longitude}&destination=${endPosition.latitude},${endPosition.longitude}&mode=driving&key=$mapKey';
 
