@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_clone_2/brand_colors.dart';
 import 'package:uber_clone_2/datamodels/prediction.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/globalvariable.dart';
 import 'package:uber_clone_2/helpers/requesthelpers.dart';
+import 'package:uber_clone_2/widgets/brand_divider.dart';
+import 'package:uber_clone_2/widgets/prediction_tile.dart';
 
 class SearchPage extends StatefulWidget {
 
@@ -19,6 +22,8 @@ class _SearchPageState extends State<SearchPage> {
   var destinationController = TextEditingController();
 
   var focusDestination = FocusNode();
+
+  List<Prediction> destinationPredictionList = []; //todo 2
 
   bool focused = false;
   void setFocus(){
@@ -38,14 +43,19 @@ class _SearchPageState extends State<SearchPage> {
         return;
       }
 
-      //todo 2 (finish)
       if(response['status'] == 'OK'){
         var predictionJson = response['predictions'];
         var thisList = (predictionJson as List).map((e) => Prediction.fromJson(e)).toList();
+
+        setState(() {
+          destinationPredictionList = thisList; //todo 3
+        });
       }
     }
 
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,19 +68,16 @@ class _SearchPageState extends State<SearchPage> {
     return Scaffold(
       body: Column(children: [
         Container(
-          height: 210,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
+            height: 210,
+            decoration: BoxDecoration(color: Colors.white, boxShadow: [
               BoxShadow(
                 color: Colors.black26,
                 blurRadius: 5.0,
                 spreadRadius: 0.5,
-                offset: Offset(0.7,0.7),
+                offset: Offset(0.7, 0.7),
               )
-            ]
-          ),
-          child: Padding(
+            ]),
+            child: Padding(
               padding: const EdgeInsets.only(
                   left: 24, top: 48, right: 24, bottom: 20),
               child: Column(
@@ -128,8 +135,9 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Row(
                     children: [
                       Image.asset('images/desticon.png', width: 16, height: 16),
@@ -143,7 +151,7 @@ class _SearchPageState extends State<SearchPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: TextField(
-                              onChanged: (value){
+                              onChanged: (value) {
                                 searchPlace(value);
                               },
                               focusNode: focusDestination,
@@ -165,8 +173,26 @@ class _SearchPageState extends State<SearchPage> {
                 ],
               ),
             ),
-          )
-      ],),
+          ),
+          (destinationPredictionList.length > 0) //todo 4
+              ? Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8,horizontal: 16),
+                child: ListView.separated(
+            padding: EdgeInsets.all(0),
+                    itemBuilder: (context, index) => PredictionTile(
+                      prediction: destinationPredictionList[index],
+                    ),
+                    separatorBuilder: (context, index) => BrandDivider(),
+                    itemCount: destinationPredictionList.length,
+                    shrinkWrap: true,
+                    physics: ClampingScrollPhysics(),
+                  ),
+              )
+              : Container(), //todo 5 (finish)
+        ],
+      ),
     );
   }
 }
+
+

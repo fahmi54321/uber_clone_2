@@ -194,24 +194,26 @@ class _MainPageState extends State<MainPage> {
                         SizedBox(
                           width: 12,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text((Provider.of<AppData>(context).pickupAddress !=
-                                    null)
-                                ? Provider.of<AppData>(context)
-                                    .pickupAddress
-                                    .placeName
-                                : 'Add Home'),
-                            SizedBox(height: 3),
-                            Text(
-                              'Your residential address',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: BrandColors.colorDimText,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text((Provider.of<AppData>(context).pickupAddress !=
+                                      null)
+                                  ? Provider.of<AppData>(context)
+                                      .pickupAddress
+                                      .placeName
+                                  : 'Add Home',overflow: TextOverflow.ellipsis,maxLines: 1,),
+                              SizedBox(height: 3),
+                              Text(
+                                'Your residential address',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: BrandColors.colorDimText,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),

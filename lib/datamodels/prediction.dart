@@ -1,5 +1,4 @@
 
-//todo 1 (next searchpage)
 class Prediction{
   String placeId;
   String mainText;
