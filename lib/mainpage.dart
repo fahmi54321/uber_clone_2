@@ -19,6 +19,7 @@ import 'package:uber_clone_2/widgets/progress_dialog.dart';
 import 'package:uber_clone_2/widgets/taxi_button.dart';
 
 import 'brand_colors.dart';
+import 'globalvariable.dart';
 
 class MainPage extends StatefulWidget {
   static const String id = 'main';
@@ -42,16 +43,13 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
   double rideDetailsSheetHeight= 0; // (Platform.isIOS) ? 235 : 260
 
-  DirectionDetails tripDirectionDetails; //todo 2
-
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
+  DirectionDetails tripDirectionDetails;
 
 
   var geolocator = Geolocator();
   Position currentPosition;
+
+  bool drawerCanOpen = true; //todo 1
 
   void setupPositionLocator() async{
       Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
@@ -83,7 +81,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     var thisDetails = await HelperMethods.getDirectionDetails(pickLatlng, destinationLatlng);
 
     setState(() {
-      tripDirectionDetails = thisDetails; //todo 2
+      tripDirectionDetails = thisDetails;
     });
 
     Navigator.pop(context);
@@ -192,7 +190,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       _circles.add(destinationCircle);
     });
 
-
   }
 
   void showDetailSheet() async{
@@ -202,7 +199,24 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       searchSheetHeight = 0;
       rideDetailsSheetHeight = (Platform.isAndroid) ? 235 : 260;
       mapBottomPadding = (Platform.isAndroid) ? 240 : 230;
+      drawerCanOpen = false;
     });
+  }
+
+  resetApp(){ //todo 3
+
+    setState(() {
+      polylineCoordinates.clear();
+      _polylines.clear();
+      _circles.clear();
+      _markers.clear();
+      rideDetailsSheetHeight = 0;
+      searchSheetHeight = (Platform.isAndroid) ? 275 : 300;
+      mapBottomPadding = (Platform.isAndroid) ? 280 : 270;
+      drawerCanOpen = true;
+    });
+
+    setupPositionLocator();
   }
 
   @override
@@ -213,7 +227,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
         children: [
           GoogleMap(
             padding: EdgeInsets.only(bottom: mapBottomPadding),
-            initialCameraPosition: _kGooglePlex,
+            initialCameraPosition: googlePlex,
             mapType: MapType.normal,
             myLocationButtonEnabled: true,
             onMapCreated: (GoogleMapController controller) {
@@ -241,7 +255,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             left: 20,
             child: GestureDetector(
               onTap: (){
-                scaffoldKey.currentState.openDrawer();
+                if(drawerCanOpen){
+                  scaffoldKey.currentState.openDrawer(); //todo 4
+                }else{
+                  resetApp(); //todo 5 (finish)
+                }
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -259,7 +277,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 20,
-                  child: Icon(Icons.menu,color: Colors.black87,),
+                  child: Icon( //todo 2
+                    (drawerCanOpen) ? Icons.menu : Icons.arrow_back,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
             ),
@@ -464,7 +485,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                               children: [
                                 Text('Taxi',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold'),),
                                   Text(
-                                    (tripDirectionDetails != null) //todo 3
+                                    (tripDirectionDetails != null)
                                         ? tripDirectionDetails.distanceText
                                         : '',
                                     style: TextStyle(
@@ -475,7 +496,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                             ),
                             Expanded(child: Container()),
                               Text(
-                                  (tripDirectionDetails != null) //todo 4 (finish)
+                                  (tripDirectionDetails != null)
                                       ? '\$${HelperMethods.estimateFares(tripDirectionDetails)}'
                                       : '',
                                   style: TextStyle(
