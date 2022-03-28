@@ -26,7 +26,7 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   Completer<GoogleMapController> _controller = Completer();
   GoogleMapController mapController;
   double mapBottomPadding = 0;
@@ -38,6 +38,9 @@ class _MainPageState extends State<MainPage> {
 
   Set<Marker> _markers = {};
   Set<Circle> _circles = {};
+
+  //todo 3
+  double rideDetailsSheetHeight= 0; // (Platform.isIOS) ? 235 : 260
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -186,6 +189,17 @@ class _MainPageState extends State<MainPage> {
 
   }
 
+  //todo 4
+  void showDetailSheet() async{
+    await getDirection();
+
+    setState(() {
+      searchSheetHeight = 0;
+      rideDetailsSheetHeight = (Platform.isAndroid) ? 235 : 260;
+      mapBottomPadding = (Platform.isAndroid) ? 240 : 230;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,9 +265,168 @@ class _MainPageState extends State<MainPage> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: Container(
-              height: searchSheetHeight,
-              decoration: BoxDecoration(
+            child: AnimatedSize( //todo 1
+              vsync: this,
+              duration: Duration(milliseconds: 150),
+              curve: Curves.easeIn,
+              child: Container(
+                height: searchSheetHeight,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 15.0,
+                        spreadRadius: 0.5,
+                        offset: Offset(0.7, 0.7),
+                      ),
+                    ]),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 18,),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        'Nice to see you',
+                        style: TextStyle(fontSize: 10),
+                      ),
+                      Text(
+                        'Where are you going',
+                        style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () async{
+                          var response = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+
+                          if(response == 'getDirection'){
+                            showDetailSheet(); //todo 5 (finish)
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(
+                                4,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 5.0,
+                                  spreadRadius: 0.5,
+                                  offset: Offset(0.7, 0.7),
+                                ),
+                              ]),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.9),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search,
+                                  color: Colors.blueAccent,
+                                ),
+                                SizedBox(width: 10),
+                                Text('Search Destination'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 22,
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            OMIcons.home,
+                            color: BrandColors.colorDimText,
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text((Provider.of<AppData>(context).pickupAddress !=
+                                        null)
+                                    ? Provider.of<AppData>(context)
+                                        .pickupAddress
+                                        .placeName
+                                    : 'Add Home',overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                SizedBox(height: 3),
+                                Text(
+                                  'Your residential address',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: BrandColors.colorDimText,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+
+                      BrandDivider(),
+
+                      SizedBox(height: 16,),
+
+                      Row(
+                        children: [
+                          Icon(
+                            OMIcons.workOutline,
+                            color: BrandColors.colorDimText,
+                          ),
+                          SizedBox(
+                            width: 12,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Add Work'),
+                              SizedBox(height: 3),
+                              Text(
+                                'Your office address',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: BrandColors.colorDimText,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // RideDetails Sheet
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: AnimatedSize( //todo 2
+              vsync: this,
+              duration: Duration(milliseconds: 150),
+              curve: Curves.easeIn,
+              child: Container(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(15),
@@ -266,209 +439,59 @@ class _MainPageState extends State<MainPage> {
                       spreadRadius: 0.5,
                       offset: Offset(0.7, 0.7),
                     ),
-                  ]),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 18,),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      'Nice to see you',
-                      style: TextStyle(fontSize: 10),
-                    ),
-                    Text(
-                      'Where are you going',
-                      style: TextStyle(fontSize: 18, fontFamily: 'Brand-Bold'),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () async{
-                        var response = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
-
-                        if(response == 'getDirection'){
-                          await getDirection();
-                        }
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(
-                              4,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 5.0,
-                                spreadRadius: 0.5,
-                                offset: Offset(0.7, 0.7),
-                              ),
-                            ]),
+                  ],
+                ),
+                height: rideDetailsSheetHeight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        color: BrandColors.colorAccent1,
                         child: Padding(
-                          padding: const EdgeInsets.all(12.9),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search,
-                                color: Colors.blueAccent,
-                              ),
-                              SizedBox(width: 10),
-                              Text('Search Destination'),
-                            ],
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(children: [
+                            Image.asset('images/taxi.png',height: 70,width: 70),
+                            SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Taxi',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold'),),
+                                Text('14km',style: TextStyle(fontSize: 16,color: BrandColors.colorTextLight),),
+                              ],
+                            ),
+                            Expanded(child: Container()),
+                            Text('\$13',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold')),
+                          ],),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 22,
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          OMIcons.home,
-                          color: BrandColors.colorDimText,
+                      SizedBox(height: 22),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(children: [
+                          Icon(FontAwesomeIcons.moneyBillAlt,size: 18,color: BrandColors.colorTextLight),
+                          SizedBox(width: 16),
+                          Text('Cash'),
+                          SizedBox(width: 5),
+                          Icon(Icons.keyboard_arrow_down,color: BrandColors.colorTextLight,size: 16),
+                        ],),
+                      ),
+                      SizedBox(height: 22),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: TaxiButton(
+                          title: 'REQUEST CAB',
+                          color: BrandColors.colorGreen,
+                          onPressed: () {},
                         ),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text((Provider.of<AppData>(context).pickupAddress !=
-                                      null)
-                                  ? Provider.of<AppData>(context)
-                                      .pickupAddress
-                                      .placeName
-                                  : 'Add Home',overflow: TextOverflow.ellipsis,maxLines: 1,),
-                              SizedBox(height: 3),
-                              Text(
-                                'Your residential address',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: BrandColors.colorDimText,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-
-                    BrandDivider(),
-
-                    SizedBox(height: 16,),
-
-                    Row(
-                      children: [
-                        Icon(
-                          OMIcons.workOutline,
-                          color: BrandColors.colorDimText,
-                        ),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Add Work'),
-                            SizedBox(height: 3),
-                            Text(
-                              'Your office address',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: BrandColors.colorDimText,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-
-          //todo 1
-          // RideDetails Sheet
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(15),
-                  topRight: Radius.circular(15),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 15.0,
-                    spreadRadius: 0.5,
-                    offset: Offset(0.7, 0.7),
-                  ),
-                ],
-              ),
-              height: 260,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Column(
-                  children: [
-                    Container(
-                      width: double.infinity,
-                      color: BrandColors.colorAccent1,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(children: [
-                          Image.asset('images/taxi.png',height: 70,width: 70),
-                          SizedBox(width: 16),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Taxi',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold'),),
-                              Text('14km',style: TextStyle(fontSize: 16,color: BrandColors.colorTextLight),),
-                            ],
-                          ),
-                          Expanded(child: Container()),
-                          Text('\$13',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold')),
-                        ],),
-                      ),
-                    ),
-                    SizedBox(height: 22),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(children: [
-                        Icon(FontAwesomeIcons.moneyBillAlt,size: 18,color: BrandColors.colorTextLight),
-                        SizedBox(width: 16),
-                        Text('Cash'),
-                        SizedBox(width: 5),
-                        Icon(Icons.keyboard_arrow_down,color: BrandColors.colorTextLight,size: 16),
-                      ],),
-                    ),
-                    SizedBox(height: 22),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: TaxiButton(
-                        title: 'REQUEST CAB',
-                        color: BrandColors.colorGreen,
-                        onPressed: () {},
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ), //todo 2 (finish)
         ],
       ),
       drawer: Container(
