@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_clone_2/datamodels/directiondetails.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/helpers/helpersmethod.dart';
 import 'package:uber_clone_2/screens/searchpage.dart';
@@ -39,8 +40,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   Set<Marker> _markers = {};
   Set<Circle> _circles = {};
 
-  //todo 3
   double rideDetailsSheetHeight= 0; // (Platform.isIOS) ? 235 : 260
+
+  DirectionDetails tripDirectionDetails; //todo 2
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -79,6 +81,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     );
 
     var thisDetails = await HelperMethods.getDirectionDetails(pickLatlng, destinationLatlng);
+
+    setState(() {
+      tripDirectionDetails = thisDetails; //todo 2
+    });
 
     Navigator.pop(context);
 
@@ -189,7 +195,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
   }
 
-  //todo 4
   void showDetailSheet() async{
     await getDirection();
 
@@ -265,7 +270,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             left: 0,
             right: 0,
             bottom: 0,
-            child: AnimatedSize( //todo 1
+            child: AnimatedSize(
               vsync: this,
               duration: Duration(milliseconds: 150),
               curve: Curves.easeIn,
@@ -309,7 +314,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                           var response = await Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
 
                           if(response == 'getDirection'){
-                            showDetailSheet(); //todo 5 (finish)
+                            showDetailSheet();
                           }
                         },
                         child: Container(
@@ -421,7 +426,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             left: 0,
             right: 0,
             bottom: 0,
-            child: AnimatedSize( //todo 2
+            child: AnimatedSize(
               vsync: this,
               duration: Duration(milliseconds: 150),
               curve: Curves.easeIn,
@@ -458,12 +463,24 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Taxi',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold'),),
-                                Text('14km',style: TextStyle(fontSize: 16,color: BrandColors.colorTextLight),),
-                              ],
+                                  Text(
+                                    (tripDirectionDetails != null) //todo 3
+                                        ? tripDirectionDetails.distanceText
+                                        : '',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: BrandColors.colorTextLight),
+                                  ),
+                                ],
                             ),
                             Expanded(child: Container()),
-                            Text('\$13',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold')),
-                          ],),
+                              Text(
+                                  (tripDirectionDetails != null) //todo 4 (finish)
+                                      ? '\$${HelperMethods.estimateFares(tripDirectionDetails)}'
+                                      : '',
+                                  style: TextStyle(
+                                      fontSize: 18, fontFamily: 'Brand-Bold')),
+                            ],),
                         ),
                       ),
                       SizedBox(height: 22),
