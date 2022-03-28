@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
@@ -13,6 +15,7 @@ import 'package:uber_clone_2/screens/searchpage.dart';
 import 'package:uber_clone_2/styles/styles.dart';
 import 'package:uber_clone_2/widgets/brand_divider.dart';
 import 'package:uber_clone_2/widgets/progress_dialog.dart';
+import 'package:uber_clone_2/widgets/taxi_button.dart';
 
 import 'brand_colors.dart';
 
@@ -33,8 +36,8 @@ class _MainPageState extends State<MainPage> {
   List<LatLng> polylineCoordinates = [];
   Set<Polyline> _polylines = {};
 
-  Set<Marker> _markers = {}; //todo 1
-  Set<Circle> _circles = {}; //todo 2
+  Set<Marker> _markers = {};
+  Set<Circle> _circles = {};
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -136,7 +139,6 @@ class _MainPageState extends State<MainPage> {
 
     mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 70));
 
-    //todo 3
     // set marker
     Marker pickupMarker = Marker(
       markerId: MarkerId('pickup'),
@@ -157,7 +159,6 @@ class _MainPageState extends State<MainPage> {
       _markers.add(destinationMarker);
     });
 
-    //todo 4
     // set circle
     Circle pickupCircle = Circle(
       circleId: CircleId('pickup'),
@@ -211,8 +212,8 @@ class _MainPageState extends State<MainPage> {
             zoomGesturesEnabled: true,
             zoomControlsEnabled: false,
             polylines: _polylines,
-            markers: _markers, //todo 5
-            circles: _circles, //todo 6 (finish)
+            markers: _markers,
+            circles: _circles,
           ),
 
           // MenuButton
@@ -244,7 +245,6 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
-
 
           // SearchSheet
           Positioned(
@@ -396,6 +396,79 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
+
+          //todo 1
+          // RideDetails Sheet
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 15.0,
+                    spreadRadius: 0.5,
+                    offset: Offset(0.7, 0.7),
+                  ),
+                ],
+              ),
+              height: 260,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      color: BrandColors.colorAccent1,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(children: [
+                          Image.asset('images/taxi.png',height: 70,width: 70),
+                          SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Taxi',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold'),),
+                              Text('14km',style: TextStyle(fontSize: 16,color: BrandColors.colorTextLight),),
+                            ],
+                          ),
+                          Expanded(child: Container()),
+                          Text('\$13',style: TextStyle(fontSize: 18,fontFamily: 'Brand-Bold')),
+                        ],),
+                      ),
+                    ),
+                    SizedBox(height: 22),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(children: [
+                        Icon(FontAwesomeIcons.moneyBillAlt,size: 18,color: BrandColors.colorTextLight),
+                        SizedBox(width: 16),
+                        Text('Cash'),
+                        SizedBox(width: 5),
+                        Icon(Icons.keyboard_arrow_down,color: BrandColors.colorTextLight,size: 16),
+                      ],),
+                    ),
+                    SizedBox(height: 22),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: TaxiButton(
+                        title: 'REQUEST CAB',
+                        color: BrandColors.colorGreen,
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ), //todo 2 (finish)
         ],
       ),
       drawer: Container(
