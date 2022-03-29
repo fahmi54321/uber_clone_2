@@ -78,7 +78,6 @@ class HelperMethods{
 
   }
 
-  //todo 1 (next mainpage)
   static void getCurrentUserInfo() async{
     currentFirebaseUser = await FirebaseAuth.instance.currentUser();
     String userId = currentFirebaseUser.uid;

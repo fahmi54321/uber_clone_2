@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -52,6 +53,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   Position currentPosition;
 
   bool drawerCanOpen = true;
+
+  DatabaseReference rideRef;
 
   void setupPositionLocator() async{
       Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
@@ -221,7 +224,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     setupPositionLocator();
   }
 
-  void showRequestingSheet(){ //todo 3
+  void showRequestingSheet(){
     setState(() {
       rideDetailsSheetHeight = 0;
       requestingSheetHeight = (Platform.isAndroid) ? 195 : 220;
@@ -229,12 +232,47 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
       drawerCanOpen = true;
     });
+
+    createRideRquest(); //todo 2 (finish)
+  }
+
+  //todo 1
+  void createRideRquest(){
+    rideRef = FirebaseDatabase.instance.reference().child('rideRquest').push();
+
+    var pickup = Provider.of<AppData>(context,listen: false).pickupAddress;
+    var destination = Provider.of<AppData>(context,listen: false).destinationAddress;
+
+    Map pickupMap = {
+      'latitude' : pickup.latitude.toString(),
+      'longitude' : pickup.longitude.toString(),
+    };
+
+    Map destinationMap = {
+      'latitude' : destination.latitude.toString(),
+      'longitude' : destination.longitude.toString(),
+    };
+
+    Map rideMap = {
+      'created_at' : DateTime.now().toString(),
+      'rider_name' : currentUserInfo.fullName,
+      'rider_phone' : currentUserInfo.phone,
+      'pickup_address' : pickup.placeName,
+      'destination_address' : destination.placeName,
+      'location' : pickupMap,
+      'destination' : destinationMap,
+      'payment_method' : 'card',
+      'driver_id' :  'waiting',
+    };
+
+    rideRef.set(rideMap);
+
   }
 
   @override
   void initState() {
     super.initState();
-    HelperMethods.getCurrentUserInfo(); //todo 2 (finish)
+    HelperMethods.getCurrentUserInfo();
   }
 
   @override
