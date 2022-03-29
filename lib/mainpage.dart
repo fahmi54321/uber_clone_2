@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -41,7 +42,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   Set<Marker> _markers = {};
   Set<Circle> _circles = {};
 
-  double rideDetailsSheetHeight= 0; // (Platform.isIOS) ? 235 : 260
+  double rideDetailsSheetHeight= 0; // (Platform.isAndroid) ? 235 : 260
+  double requestingSheetHeight= 0; // (Platform.isAbdroid) ? 195 : 220 //todo 2
 
   DirectionDetails tripDirectionDetails;
 
@@ -49,7 +51,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   var geolocator = Geolocator();
   Position currentPosition;
 
-  bool drawerCanOpen = true; //todo 1
+  bool drawerCanOpen = true;
 
   void setupPositionLocator() async{
       Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
@@ -203,7 +205,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     });
   }
 
-  resetApp(){ //todo 3
+  resetApp(){
 
     setState(() {
       polylineCoordinates.clear();
@@ -217,6 +219,16 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     });
 
     setupPositionLocator();
+  }
+
+  void showRequestingSheet(){ //todo 3
+    setState(() {
+      rideDetailsSheetHeight = 0;
+      requestingSheetHeight = (Platform.isAndroid) ? 195 : 220;
+      mapBottomPadding = (Platform.isAndroid) ? 200 : 190;
+
+      drawerCanOpen = true;
+    });
   }
 
   @override
@@ -256,9 +268,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             child: GestureDetector(
               onTap: (){
                 if(drawerCanOpen){
-                  scaffoldKey.currentState.openDrawer(); //todo 4
+                  scaffoldKey.currentState.openDrawer();
                 }else{
-                  resetApp(); //todo 5 (finish)
+                  resetApp();
                 }
               },
               child: Container(
@@ -277,7 +289,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                 child: CircleAvatar(
                   backgroundColor: Colors.white,
                   radius: 20,
-                  child: Icon( //todo 2
+                  child: Icon(
                     (drawerCanOpen) ? Icons.menu : Icons.arrow_back,
                     color: Colors.black87,
                   ),
@@ -521,9 +533,93 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                         child: TaxiButton(
                           title: 'REQUEST CAB',
                           color: BrandColors.colorGreen,
-                          onPressed: () {},
+                          onPressed: () {
+                            showRequestingSheet(); // todo 4 (finish)
+                          },
                         ),
                       ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Requesting sheet // todo 1
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: AnimatedSize(
+              vsync: this,
+              duration: Duration(milliseconds: 150),
+              curve: Curves.easeIn,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight: Radius.circular(15),),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 15,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7,0.7),
+                    ),
+                  ]
+                ),
+                height: requestingSheetHeight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24,vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextLiquidFill(
+                          text: 'Requesting a Ride...',
+                          waveColor: BrandColors.colorTextLight,
+                          boxBackgroundColor: Colors.white,
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Brand-Bold',
+                          ),
+                          boxHeight: 40.0,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                            width: 1,
+                            color: BrandColors.colorLightGrayFair,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          size: 25,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        child: Text(
+                          'Cancel ride',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+
                     ],
                   ),
                 ),
