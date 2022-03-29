@@ -216,6 +216,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       _circles.clear();
       _markers.clear();
       rideDetailsSheetHeight = 0;
+      requestingSheetHeight = 0; //todo 2
       searchSheetHeight = (Platform.isAndroid) ? 275 : 300;
       mapBottomPadding = (Platform.isAndroid) ? 280 : 270;
       drawerCanOpen = true;
@@ -233,10 +234,9 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       drawerCanOpen = true;
     });
 
-    createRideRquest(); //todo 2 (finish)
+    createRideRquest();
   }
 
-  //todo 1
   void createRideRquest(){
     rideRef = FirebaseDatabase.instance.reference().child('rideRquest').push();
 
@@ -267,6 +267,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
     rideRef.set(rideMap);
 
+  }
+
+  void cancelRequest(){
+    rideRef.remove(); //todo 1
   }
 
   @override
@@ -589,7 +593,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             ),
           ),
 
-          // Requesting sheet // todo 1
+          // Requesting sheet
           Positioned(
             left: 0,
             right: 0,
@@ -636,20 +640,26 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                       SizedBox(
                         height: 20,
                       ),
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            width: 1,
-                            color: BrandColors.colorLightGrayFair,
+                      GestureDetector(
+                        onTap: (){
+                          cancelRequest(); //todo 3
+                          resetApp(); //todo 4 (finish)
+                        },
+                        child: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(
+                              width: 1,
+                              color: BrandColors.colorLightGrayFair,
+                            ),
                           ),
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          size: 25,
+                          child: Icon(
+                            Icons.close,
+                            size: 25,
+                          ),
                         ),
                       ),
                       SizedBox(
