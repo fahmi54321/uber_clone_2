@@ -234,11 +234,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       drawerCanOpen = true;
     });
 
-    createRideRquest();
+    createRideRequest();
   }
 
-  void createRideRquest(){
-    rideRef = FirebaseDatabase.instance.reference().child('rideRquest').push();
+  void createRideRequest(){
+    rideRef = FirebaseDatabase.instance.reference().child('rideRequest').push();
 
     var pickup = Provider.of<AppData>(context,listen: false).pickupAddress;
     var destination = Provider.of<AppData>(context,listen: false).destinationAddress;
