@@ -1,8 +1,11 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_clone_2/datamodels/address.dart';
 import 'package:uber_clone_2/datamodels/directiondetails.dart';
+import 'package:uber_clone_2/datamodels/user.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
 import 'package:uber_clone_2/globalvariable.dart';
 import 'package:uber_clone_2/helpers/requesthelpers.dart';
@@ -38,7 +41,6 @@ class HelperMethods{
 
   }
 
-
   static Future<DirectionDetails> getDirectionDetails(LatLng startPosition, LatLng endPosition) async{
     String url = 'https://maps.googleapis.com/maps/api/directions/json?origin=${startPosition.latitude},${startPosition.longitude}&destination=${endPosition.latitude},${endPosition.longitude}&mode=driving&key=$mapKey';
 
@@ -61,7 +63,6 @@ class HelperMethods{
 
   }
 
-  //todo 1 (next mainpage)
   static int estimateFares(DirectionDetails details){
     // per km = $0.3
     // per minute = $0.2
@@ -75,6 +76,20 @@ class HelperMethods{
 
     return totalFare.truncate();
 
+  }
+
+  //todo 1 (next mainpage)
+  static void getCurrentUserInfo() async{
+    currentFirebaseUser = await FirebaseAuth.instance.currentUser();
+    String userId = currentFirebaseUser.uid;
+
+    DatabaseReference userRef = FirebaseDatabase.instance.reference().child('users/$userId');
+    userRef.once().then((DataSnapshot snapshot) {
+      if(snapshot.value != null){
+        currentUserInfo = User.fromSnaphsot(snapshot);
+
+      }
+    });
   }
 
 }

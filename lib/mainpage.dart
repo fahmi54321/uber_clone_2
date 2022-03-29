@@ -43,7 +43,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   Set<Circle> _circles = {};
 
   double rideDetailsSheetHeight= 0; // (Platform.isAndroid) ? 235 : 260
-  double requestingSheetHeight= 0; // (Platform.isAbdroid) ? 195 : 220 //todo 2
+  double requestingSheetHeight= 0; // (Platform.isAbdroid) ? 195 : 220
 
   DirectionDetails tripDirectionDetails;
 
@@ -229,6 +229,12 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
       drawerCanOpen = true;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    HelperMethods.getCurrentUserInfo(); //todo 2 (finish)
   }
 
   @override
