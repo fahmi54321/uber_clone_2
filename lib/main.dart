@@ -14,14 +14,14 @@ Future<void> main() async {
     name: 'db2',
     options: Platform.isIOS
         ? const FirebaseOptions(
-      googleAppID: '1:297855924061:ios:c6de2b69b03a5be8',
+      googleAppID: '1:448216127030:android:50dede8b8479a13e62aa97',
       gcmSenderID: '297855924061',
-      databaseURL: 'https://uber-clone-33688-default-rtdb.firebaseio.com',
+      databaseURL: 'https://uber-d5e16-default-rtdb.firebaseio.com',
     )
         : const FirebaseOptions(
-      googleAppID: '1:414658273257:android:6a25bf0fdd5c2b33c8b578',
-      apiKey: 'AIzaSyDkcO01UIRRvWzdcb99HR62-0ra2GsFUIk',
-      databaseURL: 'https://uber-clone-33688-default-rtdb.firebaseio.com',
+      googleAppID: '1:448216127030:android:50dede8b8479a13e62aa97',
+      apiKey: 'AIzaSyD12_TVFRT2F_k-QMrfFt7vUpYhITwoHYQ',
+      databaseURL: 'https://uber-d5e16-default-rtdb.firebaseio.com',
     ),
   );
   runApp(MyApp());
@@ -39,8 +39,8 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Brand-Regular',
           primarySwatch: Colors.blue,
         ),
-        home: MainPage(),
-        initialRoute: MainPage.id,
+        home: LoginPage(),
+        initialRoute: LoginPage.id,
         routes: {
           RegisterPage.id : (context) => RegisterPage(),
           LoginPage.id : (context) => LoginPage(),
