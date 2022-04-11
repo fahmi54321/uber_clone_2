@@ -5,6 +5,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -65,8 +66,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       mapController.animateCamera(CameraUpdate.newCameraPosition(cp));
 
 
-      String address = await HelperMethods.findCoordinateAddress(position,context);
-      print(address);
+      // String address = await HelperMethods.findCoordinateAddress(position,context);
+      startGeofireListener(); //todo 2 (finish)
 
   }
 
@@ -216,7 +217,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       _circles.clear();
       _markers.clear();
       rideDetailsSheetHeight = 0;
-      requestingSheetHeight = 0; //todo 2
+      requestingSheetHeight = 0;
       searchSheetHeight = (Platform.isAndroid) ? 275 : 300;
       mapBottomPadding = (Platform.isAndroid) ? 280 : 270;
       drawerCanOpen = true;
@@ -270,7 +271,41 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
   }
 
   void cancelRequest(){
-    rideRef.remove(); //todo 1
+    rideRef.remove();
+  }
+
+  //todo 1
+  void startGeofireListener() {
+    Geofire.initialize('driversAvailable');
+
+    Geofire.queryAtLocation(
+        currentPosition.latitude, currentPosition.longitude, 1).listen((map) {
+      print(map);
+      if (map != null) {
+        var callBack = map['callBack'];
+
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+
+        switch (callBack) {
+          case Geofire.onKeyEntered:
+            break;
+
+          case Geofire.onKeyExited:
+            break;
+
+          case Geofire.onKeyMoved:
+          // Update your key's location
+            break;
+
+          case Geofire.onGeoQueryReady:
+          // All Intial Data is loaded
+            print(map['result']);
+
+            break;
+        }
+      }
+    });
   }
 
   @override
@@ -582,7 +617,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                           title: 'REQUEST CAB',
                           color: BrandColors.colorGreen,
                           onPressed: () {
-                            showRequestingSheet(); // todo 4 (finish)
+                            showRequestingSheet();
                           },
                         ),
                       ),
@@ -642,8 +677,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
                       ),
                       GestureDetector(
                         onTap: (){
-                          cancelRequest(); //todo 3
-                          resetApp(); //todo 4 (finish)
+                          cancelRequest();
+                          resetApp();
                         },
                         child: Container(
                           height: 50,
