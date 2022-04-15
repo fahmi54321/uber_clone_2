@@ -13,7 +13,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_clone_2/datamodels/directiondetails.dart';
+import 'package:uber_clone_2/datamodels/nearbydriver.dart';
 import 'package:uber_clone_2/dataprovider/appdata.dart';
+import 'package:uber_clone_2/helpers/firehelper.dart';
 import 'package:uber_clone_2/helpers/helpersmethod.dart';
 import 'package:uber_clone_2/screens/searchpage.dart';
 import 'package:uber_clone_2/styles/styles.dart';
@@ -67,7 +69,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
 
       // String address = await HelperMethods.findCoordinateAddress(position,context);
-      startGeofireListener(); //todo 2 (finish)
+      startGeofireListener();
 
   }
 
@@ -274,12 +276,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     rideRef.remove();
   }
 
-  //todo 1
   void startGeofireListener() {
     Geofire.initialize('driversAvailable');
 
     Geofire.queryAtLocation(
-        currentPosition.latitude, currentPosition.longitude, 1).listen((map) {
+        currentPosition.latitude, currentPosition.longitude, 20).listen((map) {
       print(map);
       if (map != null) {
         var callBack = map['callBack'];
@@ -289,18 +290,37 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
         switch (callBack) {
           case Geofire.onKeyEntered:
+
+            NearbyDriver nearbyDriver = NearbyDriver();
+            nearbyDriver.key = map['key'];
+            nearbyDriver.latitude = map['latitude'];
+            nearbyDriver.longitude = map['longitude'];
+
+            FireHelper.nearbyDriver.add(nearbyDriver); //todo 1
+
             break;
 
           case Geofire.onKeyExited:
+            
+            FireHelper.removeFromList(map['key']); //todo 2
+            
             break;
 
           case Geofire.onKeyMoved:
           // Update your key's location
+
+            NearbyDriver nearbyDriver = NearbyDriver();
+            nearbyDriver.key = map['key'];
+            nearbyDriver.latitude = map['latitude'];
+            nearbyDriver.longitude = map['longitude'];
+
+            FireHelper.updateNearbyLocation(nearbyDriver); //todo 3
+
             break;
 
           case Geofire.onGeoQueryReady:
           // All Intial Data is loaded
-            print(map['result']);
+            print('firehelper length : ${FireHelper.nearbyDriver.length}'); //todo 4 (finish)
 
             break;
         }
