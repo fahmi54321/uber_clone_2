@@ -59,6 +59,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
   DatabaseReference rideRef;
 
+  bool nearbyDriversKeysLoaded = false;
+
   void setupPositionLocator() async{
       Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
       currentPosition = position;
@@ -296,13 +298,21 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             nearbyDriver.latitude = map['latitude'];
             nearbyDriver.longitude = map['longitude'];
 
-            FireHelper.nearbyDriver.add(nearbyDriver); //todo 1
+            FireHelper.nearbyDriver.add(nearbyDriver);
+
+            //todo 5 (finish)
+            if(nearbyDriversKeysLoaded == true) {
+              updateDriversOnMap();
+            }
 
             break;
 
           case Geofire.onKeyExited:
             
-            FireHelper.removeFromList(map['key']); //todo 2
+            FireHelper.removeFromList(map['key']);
+
+            //todo 4
+            updateDriversOnMap();
             
             break;
 
@@ -314,17 +324,49 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             nearbyDriver.latitude = map['latitude'];
             nearbyDriver.longitude = map['longitude'];
 
-            FireHelper.updateNearbyLocation(nearbyDriver); //todo 3
+            FireHelper.updateNearbyLocation(nearbyDriver);
+
+            //todo 3
+            updateDriversOnMap();
 
             break;
 
           case Geofire.onGeoQueryReady:
           // All Intial Data is loaded
-            print('firehelper length : ${FireHelper.nearbyDriver.length}'); //todo 4 (finish)
+
+          //todo 2
+            nearbyDriversKeysLoaded = true;
+            updateDriversOnMap();
 
             break;
         }
       }
+    });
+  }
+
+  //todo 1
+  void updateDriversOnMap(){
+    setState(() {
+      _markers.clear();
+    });
+
+    Set<Marker> tempMarkers = Set<Marker>();
+
+    for(NearbyDriver driver in FireHelper.nearbyDriver){
+      LatLng driverPosition = LatLng(driver.latitude, driver.longitude);
+
+      Marker thisMarker = Marker(
+        markerId: MarkerId('driver${driver.key}'),
+        position: driverPosition,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        rotation: HelperMethods.generateRandomNumber(360),
+      );
+
+      tempMarkers.add(thisMarker);
+    }
+
+    setState(() {
+      _markers = tempMarkers;
     });
   }
 

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -89,6 +91,13 @@ class HelperMethods{
 
       }
     });
+  }
+
+  static double generateRandomNumber(int max){
+    var randomGenerator = Random();
+    int randInt = randomGenerator.nextInt(max);
+
+    return randInt.toDouble();
   }
 
 }
