@@ -61,6 +61,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
   bool nearbyDriversKeysLoaded = false;
 
+  BitmapDescriptor nearbyIcon;
+
   void setupPositionLocator() async{
       Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
       currentPosition = position;
@@ -300,7 +302,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
             FireHelper.nearbyDriver.add(nearbyDriver);
 
-            //todo 5 (finish)
             if(nearbyDriversKeysLoaded == true) {
               updateDriversOnMap();
             }
@@ -311,7 +312,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
             
             FireHelper.removeFromList(map['key']);
 
-            //todo 4
             updateDriversOnMap();
             
             break;
@@ -326,7 +326,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
             FireHelper.updateNearbyLocation(nearbyDriver);
 
-            //todo 3
             updateDriversOnMap();
 
             break;
@@ -344,7 +343,6 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     });
   }
 
-  //todo 1
   void updateDriversOnMap(){
     setState(() {
       _markers.clear();
@@ -358,7 +356,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
       Marker thisMarker = Marker(
         markerId: MarkerId('driver${driver.key}'),
         position: driverPosition,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        icon: nearbyIcon, //todo 3 (finish)
         rotation: HelperMethods.generateRandomNumber(360),
       );
 
@@ -370,6 +368,22 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
     });
   }
 
+  //todo 1
+  void createMarker() {
+    if (nearbyIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: Size(2, 2));
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration,
+              (Platform.isIOS)
+                  ? 'images/car_ios.png'
+                  : 'images/car_android.png')
+          .then((icon) {
+        nearbyIcon = icon;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -378,6 +392,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
+
+    //todo 2
+    createMarker();
+
     return Scaffold(
       key: scaffoldKey,
       body: Stack(
